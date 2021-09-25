@@ -1,0 +1,10 @@
+﻿td, th {
+    border: 1px solid black;
+    word-wrap: break-word;
+    align-content:center;
+    text-align: center;
+}
+table {
+    table-layout: fixed;
+    width: 50%;
+}

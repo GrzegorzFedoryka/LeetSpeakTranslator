@@ -1,0 +1,17 @@
+﻿@model LeetSpeakOutputDto
+
+@{
+    if (string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <tr>
+            <td>@Model.InputText</td>
+            <td>@Model.ConvertedText</td>
+        </tr>
+    }
+    else
+    {
+        <tr>
+            <td colspan="2">@Model.ErrorMessage</td>
+        </tr>
+    }
+}

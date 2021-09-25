@@ -1,0 +1,27 @@
+﻿@model LeetSpeakInputDto
+@* form with input textbox *@
+<div>
+    <form id="form">
+        @Html.LabelFor(l => l.Text)
+        @Html.EditorFor(l => l.Text, "Text", "Text")
+        <br />
+        <input type="submit" id="submit" value="Get your translation" />
+    </form>
+</div>
+<br />
+<table id="translatedResult">
+    <thead>
+        <tr>
+            <th>Original text</th>
+            <th>Converted text</th>
+        </tr>
+    </thead>
+</table>
+
+@* submit button handler *@
+@section scripts{
+<script type="text/javascript" src="~/js/submitButtonHandler.js"></script>
+}
+
+
+
