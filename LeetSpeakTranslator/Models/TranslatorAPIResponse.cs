@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 
 namespace LeetSpeakTranslator.Models
 {
-    public class LeetSpeakResponse
+    public class TranslatorAPIResponse
     {
-        public LeetSpeakSuccess Success { get; set; }
-        public LeetSpeakContents Contents { get; set; }
+        public APISuccess Success { get; set; }
+        public APIContents Contents { get; set; }
     }
 
-    public class LeetSpeakSuccess
+    public class APISuccess
     {
         public int Total { get; set; }
     }
-    public class LeetSpeakContents
+    public class APIContents
     {
         public string Translated { get; set; }
         public string Text { get; set; }

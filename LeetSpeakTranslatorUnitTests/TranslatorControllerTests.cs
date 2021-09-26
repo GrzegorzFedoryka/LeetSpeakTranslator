@@ -18,15 +18,15 @@ using LeetSpeakTranslator;
 namespace LeetSpeakTranslatorUnitTests
 {
     [TestClass]
-    public class LeetSpeakControllerTests
+    public class TranslatorControllerTests
     {
-        private readonly ILeetSpeakService _leetSpeakService;
+        private readonly ITranslatorService _translatorService;
         private readonly IConfiguration _configuration;
-        public LeetSpeakControllerTests()
+        public TranslatorControllerTests()
         {
             var mockMapper = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfile(new LeetSpeakMappingProfile());
+                cfg.AddProfile(new TranslatorMappingProfile());
             });
 
             var mapper = mockMapper.CreateMapper();
@@ -35,22 +35,22 @@ namespace LeetSpeakTranslatorUnitTests
             var services = new ServiceCollection();
 
             var mapperMock = new Mock<IMapper>();
-            TranslatorAPIs translatorAPIs = new();
-            _configuration.GetSection("TranslatorAPIs").Bind(translatorAPIs);
+            TranslatorAPI translatorAPI = new();
+            _configuration.GetSection("TranslatorAPI").Bind(translatorAPI);
             services.AddSingleton(mapper);
-            services.AddSingleton(translatorAPIs);
-            services.AddScoped<ILeetSpeakService, LeetSpeakService>();
+            services.AddSingleton(translatorAPI);
+            services.AddScoped<ITranslatorService, TranslatorService>();
             services.AddLogging();
             var serviceProvider = services.BuildServiceProvider();
 
-            _leetSpeakService = serviceProvider.GetService<ILeetSpeakService>();
+            _translatorService = serviceProvider.GetService<ITranslatorService>();
             
         }
         [TestMethod]
         public void TestIndexViewName_ShouldReturnCorrectViewName()
         {
             //arrange
-            var controller = new LeetSpeakController(_leetSpeakService);
+            var controller = new TranslatorController(_translatorService);
 
             //act
             var result = controller.Index() as ViewResult;
@@ -59,36 +59,36 @@ namespace LeetSpeakTranslatorUnitTests
             Assert.AreEqual("Index", result.ViewName);
         }
         [TestMethod]
-        public async Task TestConvertToLeetSpeakViewName_ShouldReturnCorrectViewName()
+        public async Task TestConvertTextViewName_ShouldReturnCorrectViewName()
         {
             //arrange
-            var controller = new LeetSpeakController(_leetSpeakService);
-            var dto = new LeetSpeakInputDto()
+            var controller = new TranslatorController(_translatorService);
+            var dto = new TranslatorInputDto()
             {
                 Text = "example string"
             };
 
             //act
-            var result = await controller.ConvertToLeetSpeak(dto) as PartialViewResult;
+            var result = await controller.ConvertText("leetspeak", dto) as PartialViewResult;
 
             //assert
-            Assert.AreEqual("_ConvertToLeetSpeak", result.ViewName);
+            Assert.AreEqual("_ConvertText", result.ViewName);
         }
         [TestMethod]
-        public async Task TestConvertToLeetSpeakNormalInput_ShouldReturnCode429OrConvertedText()
+        public async Task TestConvertTextNormalInput_ShouldReturnCode429OrConvertedText()
         {
             //arrange
-            var controller = new LeetSpeakController(_leetSpeakService);
-            var dto = new LeetSpeakInputDto()
+            var controller = new TranslatorController(_translatorService);
+            var dto = new TranslatorInputDto()
             {
                 Text = "example string"
             };
 
             //act
-            var result = await controller.ConvertToLeetSpeak(dto) as PartialViewResult;
+            var result = await controller.ConvertText("leetspeak", dto) as PartialViewResult;
 
             //assert
-            var resultModel = (LeetSpeakOutputDto)result.Model;
+            var resultModel = (TranslatorOutputDto)result.Model;
             if (string.IsNullOrEmpty(resultModel.ConvertedText))
             {
                 Assert.AreEqual("429", resultModel.Code);
@@ -101,35 +101,35 @@ namespace LeetSpeakTranslatorUnitTests
 
         [TestMethod]
         [ExpectedException(typeof(Newtonsoft.Json.JsonReaderException))]
-        public async Task TestConvertToLeetSpeakNonAlphanumericInput_ShouldThrowJSONexception()
+        public async Task TestConvertTextNonAlphanumericInput_ShouldThrowJSONexception()
         {
             //arrange
-            var controller = new LeetSpeakController(_leetSpeakService);
-            var dto = new LeetSpeakInputDto()
+            var controller = new TranslatorController(_translatorService);
+            var dto = new TranslatorInputDto()
             {
                 Text = "~'!@#$%^&*()_-+={}[]|\\:;<,>.?/"
             };
 
             //act
-            var result = await controller.ConvertToLeetSpeak(dto) as PartialViewResult;
+            var result = await controller.ConvertText("leetspeak", dto) as PartialViewResult;
             Assert.Fail();
             //assert
         }
 
         [TestMethod]
-        public async Task TestConvertToLeetSpeakEmptyInput_ShouldReturnCode429OrEmptyConvertedText()
+        public async Task TestConvertTextEmptyInput_ShouldReturnCode429OrEmptyConvertedText()
         {
-            var controller = new LeetSpeakController(_leetSpeakService);
-            var dto = new LeetSpeakInputDto()
+            var controller = new TranslatorController(_translatorService);
+            var dto = new TranslatorInputDto()
             {
                 Text = ""
             };
 
             //act
-            var result = await controller.ConvertToLeetSpeak(dto) as PartialViewResult;
+            var result = await controller.ConvertText("leetspeak", dto) as PartialViewResult;
 
             //assert
-            var resultModel = (LeetSpeakOutputDto)result.Model;
+            var resultModel = (TranslatorOutputDto)result.Model;
             if (string.IsNullOrEmpty(resultModel.Code))
             {
                 Assert.AreEqual(resultModel.ConvertedText, "");
@@ -140,6 +140,23 @@ namespace LeetSpeakTranslatorUnitTests
             }
         }
 
+        [TestMethod]
+        public async Task TestConvertUnsupportedAPI_ShouldReturnErrorJSON()
+        {
+            //arrange
+            var controller = new TranslatorController(_translatorService);
+            var dto = new TranslatorInputDto()
+            {
+                Text = "example string"
+            };
+
+            //act
+            var result = await controller.ConvertText("yoda", dto) as PartialViewResult;
+
+            //assert
+            var resultModel = (TranslatorOutputDto)result.Model;
+            Assert.AreEqual(resultModel.ErrorMessage, "Api doesn't exist or is not supported");
+        }
         public IConfigurationRoot BuildConfiguration(string testDirectory)
         {
             return new ConfigurationBuilder()

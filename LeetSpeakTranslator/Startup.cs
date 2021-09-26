@@ -26,11 +26,11 @@ namespace LeetSpeakTranslator
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            TranslatorAPIs translatorAPIs = new();
-            Configuration.GetSection("TranslatorAPIs").Bind(translatorAPIs);
-            services.AddSingleton(translatorAPIs);
+            TranslatorAPI translatorAPI = new();
+            Configuration.GetSection("TranslatorAPI").Bind(translatorAPI);
+            services.AddSingleton(translatorAPI);
             services.AddControllersWithViews();
-            services.AddScoped<ILeetSpeakService, LeetSpeakService>();
+            services.AddScoped<ITranslatorService, TranslatorService>();
             services.AddAutoMapper(this.GetType().Assembly);
             services.AddScoped<ErrorHandlingMiddleware>();
         }
@@ -61,7 +61,7 @@ namespace LeetSpeakTranslator
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Translator}/{action=Index}/{apiName?}");
             });
         }
     }

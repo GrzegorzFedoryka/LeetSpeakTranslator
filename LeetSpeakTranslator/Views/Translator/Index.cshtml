@@ -1,9 +1,12 @@
-﻿@model LeetSpeakInputDto
+﻿@model TranslatorInputDto
 @* form with input textbox *@
 <div>
     <form id="form">
-        @Html.LabelFor(l => l.Text)
-        @Html.EditorFor(l => l.Text, "Text", "Text")
+        @Html.LabelFor(i => i.Text)
+        @Html.EditorFor(i => i.Text, "Text", "Text")
+        @Html.DropDownListFor(i => i.Translators, 
+                new SelectList(Enum.GetValues(typeof(TranslatorsEnum))), 
+                "Select Translator")
         <br />
         <input type="submit" id="submit" value="Get your translation" />
     </form>

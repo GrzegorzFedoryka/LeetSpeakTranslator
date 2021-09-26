@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 
 namespace LeetSpeakTranslator.Models
 {
-    public class LeetSpeakResponseError
+    public class TranslatorAPIResponseError
     {
-        public class LeetSpeakError
+        public class APIError
         {
             public int Code { get; set; }
             public string Message { get; set; }
         }
 
-        public LeetSpeakError Error { get; set; }
+        public APIError Error { get; set; }
     }
     
 }

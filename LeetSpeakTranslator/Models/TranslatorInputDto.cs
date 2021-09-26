@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace LeetSpeakTranslator.Models
 {
-    public class TranslatorAPIs
+    public class TranslatorInputDto
     {
-        public string LeetSpeak { get; set; }
+        public string Text { get; set; }
+        public TranslatorsEnum Translators { get; set; }
     }
 }

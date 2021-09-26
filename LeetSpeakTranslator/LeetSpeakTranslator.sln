@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LeetSpeakTranslator", "LeetSpeakTranslator.csproj", "{BD47A389-1B53-4B0C-B042-6FA8A2D895BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeetSpeakTranslatorUnitTests", "..\LeetSpeakTranslatorUnitTests\LeetSpeakTranslatorUnitTests.csproj", "{197B7776-4BE0-4352-98CE-2001E28A6C25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TranslatorUnitTests", "..\LeetSpeakTranslatorUnitTests\TranslatorUnitTests.csproj", "{197B7776-4BE0-4352-98CE-2001E28A6C25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

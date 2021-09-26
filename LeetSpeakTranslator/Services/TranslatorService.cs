@@ -13,27 +13,35 @@ using System.Threading.Tasks;
 
 namespace LeetSpeakTranslator.Services
 {
-    public interface ILeetSpeakService
+    public interface ITranslatorService
     {
-        Task<LeetSpeakOutputDto> ConvertToLeetSpeak(LeetSpeakInputDto sto);
+        Task<TranslatorOutputDto> ConvertText(string apiName, TranslatorInputDto sto);
     }
 
-    public class LeetSpeakService : ILeetSpeakService
+    public class TranslatorService : ITranslatorService
     {
-        private readonly TranslatorAPIs _translatorApis;
+        private readonly TranslatorAPI _translatorApi;
         private readonly IMapper _mapper;
-        private readonly ILogger<LeetSpeakService> _logger;
+        private readonly ILogger<TranslatorService> _logger;
 
-        public LeetSpeakService(TranslatorAPIs translatorApis, IMapper mapper, ILogger<LeetSpeakService> logger)
+        public TranslatorService(TranslatorAPI translatorApi, IMapper mapper, ILogger<TranslatorService> logger)
         {
-            _translatorApis = translatorApis;
+            _translatorApi = translatorApi;
             _mapper = mapper;
             _logger = logger;
         }
-        public async Task<LeetSpeakOutputDto> ConvertToLeetSpeak(LeetSpeakInputDto dto)
+        public async Task<TranslatorOutputDto> ConvertText(string apiName, TranslatorInputDto dto) 
         {
-            _logger.LogInformation($"Leet speak translator input: {dto.Text}");
-            string apiUrl = _translatorApis.LeetSpeak;
+            _logger.LogInformation($"Translator input: {dto.Text}" +
+                $"Chosen translator: " + apiName);
+            TranslatorOutputDto outputDto = null;
+            if (!Enum.IsDefined(typeof(TranslatorsEnum), apiName))
+            {
+                outputDto = new TranslatorOutputDto();
+                outputDto.ErrorMessage = "Api doesn't exist or is not supported";
+                return outputDto;
+            }
+            string apiUrl = _translatorApi.Api + apiName;
             string responseStr = "";
 
 
@@ -52,29 +60,29 @@ namespace LeetSpeakTranslator.Services
                     responseStr = await response.Content.ReadAsStringAsync();
                 }
 
-                var leetSpeak = JsonConvert.DeserializeObject<LeetSpeakResponse>(responseStr);
+                var convertedText = JsonConvert.DeserializeObject<TranslatorAPIResponse>(responseStr);
             
-            LeetSpeakOutputDto outputDto = null;
-            if(leetSpeak != null)
+            
+            if(convertedText != null)
             {
-                outputDto = _mapper.Map<LeetSpeakOutputDto>(leetSpeak);
+                outputDto = _mapper.Map<TranslatorOutputDto>(convertedText);
             }
             if(outputDto != null && outputDto.ConvertedText == null && outputDto.InputText == null)
             {
-                var leetSpeakError = JsonConvert.DeserializeObject<LeetSpeakResponseError>(responseStr);
-                outputDto = _mapper.Map<LeetSpeakOutputDto>(leetSpeakError);
+                var convertedTextError = JsonConvert.DeserializeObject<TranslatorAPIResponseError>(responseStr);
+                outputDto = _mapper.Map<TranslatorOutputDto>(convertedTextError);
                 outputDto.InputText = dto.Text;
             }
             if (outputDto != null)
             {
-                _logger.LogInformation($"Leet speak translator output: \r\n" +
+                _logger.LogInformation($"Translator output: \r\n" +
                     $"Input text: {outputDto.InputText}\r\n" +
                     $"Converted text: {outputDto.ConvertedText}\r\n" +
                     $"Error message: {outputDto.ErrorMessage}");
             }
             else
             {
-                _logger.LogWarning("Leet speak output is null");
+                _logger.LogWarning("Translator output is null");
             }
 
 
